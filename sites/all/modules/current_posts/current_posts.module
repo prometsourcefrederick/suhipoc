@@ -129,6 +129,29 @@ function current_posts_block_info()
 }
 
 /**
+* Implements validation from the Form API
+* @param $form
+*  A structured array containing the elements and properties
+*  of the form
+* @param $form_state
+*  An array that stores information about the form's current state
+*  during processing
+*/
+function current_posts_form_validate($form, &$form_state){
+  $max_num = $form_state['values']['current_posts_max'];
+
+  if (!is_numeric($max_num)){
+    form_set_error('current_posts_max', t('You must enter a number for the
+    maximum number of posts to display.'));
+  }
+  elseif ($max_num <= 0){
+    form_set_error('current_posts_max', t('Maximum number of posts to display
+     must be positive.')
+    );
+  }
+}
+
+/**
 * Custom content function
 * Set beginning and end dates, retrieve posts from database saved in that
 * time period.
