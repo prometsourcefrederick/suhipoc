@@ -91,7 +91,7 @@ function current_posts_menu(){
     );
 
   $items['current_posts'] = array(
-    'title' => 'Current Posts2',
+    'title' => 'Current Posts',
     'page callback' => '_current_posts_page',
     'access arguments' => array('access current_posts content'),
     'type' => MENU_NORMAL_ITEM
@@ -118,6 +118,45 @@ function current_posts_form($form, &$form_state){
     );
 
   return system_settings_form($form); // saves the form's data
+}
+
+
+/**
+* Custom Page Callback Function, declared in current_posts_menu
+*
+*/
+function _current_posts_page(){
+  $result = current_posts_contents('page');
+
+  // array to contain items for the page to render.
+  $items = array();
+
+  // iterate over the result set and format as links.
+  foreach($result as $node){
+    $items[] = array(
+      'data' => l($node->title, 'node/' . $node->nid)
+    );
+  }
+
+  if(empty($items)){ // meaning, no content in the last week
+    $page_array['current_posts_arguments'] = array(
+      // Title serves as page subtitle
+      '#title' => t('All posts from the last week'),
+      '#markup' => t('No posts available')
+    );
+
+    return $page_array;
+  }
+  else{
+    $page_array['current_posts_arguments'] = array(
+      '#title' => t('All posts from the last week'),
+      '#items' => $items,
+      // Theme hook with suggestion.
+      '#theme' => 'item_list__current_posts'
+    );
+
+    return $page_array;
+  }
 }
 
 /**
@@ -178,12 +217,12 @@ function current_posts_permission(){
 * @return
 *   A result set of the targeted posts.
 */
-function current_posts_contents(){
+function current_posts_contents($display){
   // Get todays today's date
   $today = getdate();
 
   // Calculate the date a week ago
-  $start_time = mktime(0, 0, 0, $today['mon'], ($today['mday'] - 7), $today['year']);
+  $start_time = mktime(0, 0, 0, $today['mon'], ($today['mday'] - 15), $today['year']);
 
   $end_time = time();
 
@@ -194,26 +233,29 @@ function current_posts_contents(){
     ->fields('n', array('nid', 'title', 'created'))
     ->condition('status', 1) //Published
     ->condition('created', array($start_time, $end_time), 'BETWEEN')
-    ->orderBy('created', 'DESC')
-    ->range(0, $max_num)
-    ->execute();
+    ->orderBy('created', 'DESC');
 
-  return $query;
+  if($display == 'block'){
+    $query->range(0, $max_num);
+  }
+
+  return $query->execute();
 }
 
 
 /**
 * Implements hook_block_view()
 * Return a rendered or renderable view of a block.
+* This is from the "Generating block content" tutorial
 */
 function current_posts_block_view($delta = ''){
   switch($delta){
     case 'current_posts':
       $block['subject'] = t('Current posts');
 
-      if(user_access('access_content')){
+      if(user_access('access content')){
         // use our custom  function to retrieve data
-        $result = current_posts_contents();
+        $result = current_posts_contents('block');
 
         // array to contain items for the block to render.
         $items = array();
@@ -240,3 +282,10 @@ function current_posts_block_view($delta = ''){
 
   return $block;
 }
+
+
+
+
+
+
+
