@@ -1,0 +1,58 @@
+<?php
+
+/*************************************************************************************************************************************************************************************************************
+*********************************** Hooks provided by the Drupal Core and the System Module, functions that allow this module to interact with the Drupal Core ************************************************************************************************************************************************************************************************************************************************************/
+
+  /* This here is the form
+  */
+  function module_tutorial_1_form($form, &$form_state)
+  {
+    $form['price'] = array('#type'      => 'textfield',
+                           '#title'     => 'What is your price?',
+                           '#size'      => 10,
+                           '#maxlength' => 10,
+                           '#required'  => TRUE
+                          );
+
+    $form['submit_button'] = array('#type'  => 'submit',
+                                   '#value' => t('Click Here!')
+                                  );
+
+    return $form;
+  }
+
+  /* This here is the form validation
+  */
+  function module_tutorial_1_form_validate($form, &$form_state)
+  {
+    if(!($form_state['values']['price'] > 0))
+    {
+       form_set_error('price', t('Price must be positive number.'));
+    }
+  }
+
+  /* This here is the form submit handler
+  */
+  function module_tutorial_1_form_submit($form, &$form_state)
+  {
+
+  }
+
+/*************************************************************************************************************************************************************************************************************
+*********************************** Hooks provided by the Drupal Core and the System Module, functions that allow this module to interact with the Drupal Core ************************************************************************************************************************************************************************************************************************************************************/
+  /* Implements hook_menu
+  */
+  function module_tutorial_1_menu()
+  {
+    $items = array();
+
+    // creates a url that will call this form at ?q=examples/form-example
+    $items['examples/form-example'] = array('title'           => 'Example Form',
+                                            'description'     => 'A form to mess around with.',
+                                            'page callback'   => 'drupal_get_form', //this is the function that will be called when the page is accessed.  for a form, use drupal_get_form
+                                            'page arguments'  => array('module_tutorial_1_form'), // will passed to drupal_get_form() function as the first argument
+                                            'access callback' => TRUE
+                                           );
+
+    return $items;
+  }

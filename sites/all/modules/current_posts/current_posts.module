@@ -141,8 +141,8 @@ function _current_posts_page(){
   if(empty($items)){ // meaning, no content in the last week
     $page_array['current_posts_arguments'] = array(
       // Title serves as page subtitle
-      '#title' => t('All posts from the last week'),
-      '#markup' => t('No posts available')
+      '#title' => t('All posts from the last week'), // Render Arrays Topic, for
+      '#markup' => t('No posts available') // the hashtag keys.
     );
 
     return $page_array;
